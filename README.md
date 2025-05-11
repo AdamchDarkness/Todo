@@ -73,7 +73,7 @@ Ce dépôt contient :
       kubectl apply -f k8s/deployment.yaml
       kubectl apply -f k8s/service.yaml
        ```
-## 5. Déploiement Kubernetes
+## 5. GIT
    - Branches:
       - main → code stable
       - dev → développement
