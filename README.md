@@ -65,7 +65,7 @@ Ce dépôt contient :
       - deployment.yaml : Deployment 1 réplique, volume + secret injecté 
       - service.yaml : Service NodePort exposé sur le port 30080 \
    ```
-   Appliquer
+   # Appliquer
       ```bash
       export KUBECONFIG=~/.kube/config
       kubectl apply -f k8s/pvc.yaml
