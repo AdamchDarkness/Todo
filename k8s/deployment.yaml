@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      containers:
+      - name: todo
+        image: DOCKERHUB_USER/todo-flask:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: db-data
+          mountPath: /data
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: todo-pvc

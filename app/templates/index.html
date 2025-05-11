@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>TODO List</title>
+  </head>
+  <body>
+    <h1>My TODO</h1>
+    <form action="{{ url_for('add') }}" method="post">
+      <input name="task" placeholder="New task"/>
+      <button>Add</button>
+    </form>
+    <ul>
+      {% for t in tasks %}
+        <li>{{ t }} <a href="{{ url_for('done', idx=loop.index0) }}">✔</a></li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
