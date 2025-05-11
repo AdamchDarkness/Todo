@@ -30,7 +30,7 @@ Ce dépôt contient :
   ```bash
   ansible-playbook -i ansible/inventory.ini ansible/playbook.yml \ 
   --private-key=~/.ssh/id_rsa --user=vagrant
-```
+    ```
 3. Ansible installe Docker, Jenkins, Kubernetes (kubeadm + Flannel) sur les VMs.
 
 ## 2. Application Web
@@ -51,7 +51,7 @@ Ce dépôt contient :
       - Installation dépendances Python
       - Build de l’image Docker (darknessuuuu/todo-flask:${BUILD_NUMBER})
       - Push sur Docker Hub (credential dockerhub-creds)
-      - Deploy sur k8s (kubectl apply -f k8s/…, credential kubeconfig)
+      - Deploy sur k8s (kubectl apply -f k8s/..., credential kubeconfig)
    - Configurer Jenkins :
       - Installer Docker Pipeline Plugin
       - Ajouter credentials : dockerhub-creds / kubeconfig
@@ -59,8 +59,8 @@ Ce dépôt contient :
 
 ## 4. Déploiement Kubernetes
    Fournis dans k8s/ :
-      - pvc.yaml : PersistentVolumeClaim 1 Gi \ 
-      - secret.yaml : secret FLASK_ENV=prod (Base64) \ 
+      - pvc.yaml : PersistentVolumeClaim 1 Gi \
+      - secret.yaml : secret FLASK_ENV=prod (Base64) \
       - deployment.yaml : Deployment 1 réplique, volume + secret injecté \  
       - service.yaml : Service NodePort exposé sur le port 30080 \ 
    Appliquer
@@ -70,5 +70,44 @@ Ce dépôt contient :
       kubectl apply -f k8s/secret.yaml
       kubectl apply -f k8s/deployment.yaml
       kubectl apply -f k8s/service.yaml
-   ```
+    ```
+## 5. Déploiement Kubernetes
+   - Branches:
+      - main → code stable
+      - dev → développement
+   - Pull Request :
+      - Créez une PR dev → main pour validation des changements
+   - Hooks :
+      - .git/hooks/pre-commit pour lancer un linter Python avant commit
+   - Commandes
+    ```bash 
+    # branche main
+    git checkout main
+    git pull origin main
 
+    # aller sur branche dev
+    git checkout -b dev
+
+    # push sur depot distant
+    git push -u origin dev
+
+    #cree pr vers main
+    gh pr create \
+    --title "Merge dev into main" \
+    --body "merge" \
+    --base main \
+    --head dev
+    
+    #Hook pre-commit
+    cat > .git/hooks/pre-commit << 'EOF'
+    #!/bin/sh
+    echo "Lancement du linter"
+    flake8 app
+    if [ $? -ne 0 ]; then
+    echo "Erreurs"
+    exit 1
+    fi
+    EOF
+    # liberer les permission
+    chmod +x .git/hooks/pre-commit
+    ```
