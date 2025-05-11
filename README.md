@@ -18,7 +18,8 @@ Ce dépôt contient :
    ```bash
    cd terraform
    terraform init
-   terraform apply -auto-approve ```
+   terraform apply -auto-approve
+   ```
  3.Deux VMs sont créées :
   - jenkins-vm (192.168.56.1)
   - k8s-vm (192.168.56.4)
@@ -28,7 +29,8 @@ Ce dépôt contient :
 2. Depuis la racine du repo :
   ```bash
   ansible-playbook -i ansible/inventory.ini ansible/playbook.yml \ 
-  --private-key=~/.ssh/id_rsa --user=vagrant ```
+  --private-key=~/.ssh/id_rsa --user=vagrant
+```
 3. Ansible installe Docker, Jenkins, Kubernetes (kubeadm + Flannel) sur les VMs.
 
 ## 2. Application Web
@@ -38,7 +40,8 @@ Ce dépôt contient :
    ``bash
    cd app
    python3 -m pip install -r requirements.txt
-   FLASK_APP=app.py flask run ```
+   FLASK_APP=app.py flask run `
+  ``
 - Accessible sur http://localhost:5000.
 
 ## 3. Pipeline Jenkins
