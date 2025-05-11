@@ -40,3 +40,32 @@ Ce dépôt contient :
    python3 -m pip install -r requirements.txt
    FLASK_APP=app.py flask run ```
 - Accessible sur http://localhost:5000.
+
+## 3. Pipeline Jenkins
+   - Fichier : Jenkinsfile (Declarative Pipeline)
+   - Etaps :
+      - Check repo
+      - Installation dépendances Python
+      - Build de l’image Docker (darknessuuuu/todo-flask:${BUILD_NUMBER})
+      - Push sur Docker Hub (credential dockerhub-creds)
+      - Deploy sur k8s (kubectl apply -f k8s/…, credential kubeconfig)
+   - Configurer Jenkins :
+      - Installer Docker Pipeline Plugin
+      - Ajouter credentials : dockerhub-creds / kubeconfig
+   - Créer un job Pipeline pointant sur ce Jenkinsfile.
+
+## 4. Déploiement Kubernetes
+   Fournis dans k8s/ :
+      - pvc.yaml : PersistentVolumeClaim 1 Gi
+      - secret.yaml : secret FLASK_ENV=prod (Base64)
+      - deployment.yaml : Deployment 1 réplique, volume + secret injecté
+      - service.yaml : Service NodePort exposé sur le port 30080
+   Appliquer
+      ```bash
+      export KUBECONFIG=~/.kube/config
+      kubectl apply -f k8s/pvc.yaml
+      kubectl apply -f k8s/secret.yaml
+      kubectl apply -f k8s/deployment.yaml
+      kubectl apply -f k8s/service.yaml
+   ```
+
