@@ -1,0 +1,75 @@
+---
+- name: Provision Jenkins et Kubernetes
+  hosts: all
+  become: yes
+
+  tasks:
+
+  - name: Mettre à jour apt
+    apt:
+      update_cache: yes
+
+- hosts: jenkins
+  become: yes
+  roles:
+    - role: geerlingguy.docker
+    - name: Lancer Jenkins
+      docker_container:
+        name: jenkins
+        image: jenkins/jenkins:lts
+        state: started
+        published_ports:
+          - "8080:8080"
+          - "50000:50000"
+        volumes:
+          - jenkins_home:/var/jenkins_home
+
+- hosts: k8s
+  become: yes
+  tasks:
+    - name: Installer Docker et kubectl
+      apt:
+        name:
+          - docker.io
+          - apt-transport-https
+          - curl
+        state: present
+
+    - name: Ajouter dépôt Kubernetes
+      apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        filename: kubernetes
+
+    - name: Ajouter clé du dépôt
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+    - name: Installer kubelet, kubeadm, kubectl
+      apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        update_cache: yes
+
+    - name: Désactiver swap (pré-requis kubeadm)
+      shell: |
+        swapoff -a
+        sed -i '/ swap / s/^/#/' /etc/fstab
+
+    - name: Initialiser le cluster
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16
+      args:
+        creates: /etc/kubernetes/admin.conf
+
+    - name: Configurer kubeconfig pour vagrant
+      shell: |
+        mkdir -p /home/vagrant/.kube
+        cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+        chown vagrant:vagrant /home/vagrant/.kube/config
+
+    - name: Déployer Flannel
+      kubernetes.core.k8s:
+        state: present
+        definition: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml

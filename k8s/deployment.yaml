@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
       - name: todo
-        image: DOCKERHUB_USER/todo-flask:latest
+        image: darknessuuuu/todo-flask:${BUILD_NUMBER}
+
         ports:
         - containerPort: 5000
         volumeMounts:

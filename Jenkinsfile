@@ -2,44 +2,63 @@ pipeline {
   agent any
 
   environment {
-    IMAGE = "DOCKERHUB_USER/todo-flask:${env.BUILD_NUMBER}"
-    CREDS = credentials('dockerhub-creds')
+    IMAGE = "darknessuuuu/todo-flask:${env.BUILD_NUMBER}"
   }
 
   stages {
     stage("Checkout") {
-      steps { git branch: 'dev', url: 'https://github.com/DOCKERHUB_USER/todo-flask.git' }
+      steps {
+        git url: 'https://github.com/AdamchDarkness/Todo.git', branch: 'main'
+      }
     }
 
-    stage("Unit Tests") {
+    stage("Install Python Dependencies") {
       steps {
-        sh 'pip install -r requirements.txt'
-        sh 'pytest --maxfail=1 --disable-warnings -q'
+        dir('app') {
+          sh 'python3 -m pip install --upgrade pip'
+          sh 'pip3 install -r requirements.txt'
+        }
       }
     }
 
     stage("Build Docker") {
-      steps { sh "docker build -t ${IMAGE} ." }
+      steps {
+        dir('app') {
+          sh "docker build -t ${IMAGE} ."
+        }
+      }
     }
 
     stage("Push to DockerHub") {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
-                                          usernameVariable: 'U', passwordVariable: 'P')]) {
-          sh 'echo $P | docker login -u $U --password-stdin'
-          sh "docker push ${IMAGE}"
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-creds',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh '''
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push ${IMAGE}
+          '''
         }
       }
     }
 
     stage("Deploy to Kubernetes") {
       steps {
-        sh 'kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml'
+        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+          sh 'kubectl apply -f k8s/deployment.yaml'
+          sh 'kubectl apply -f k8s/service.yaml'
+          sh 'kubectl apply -f k8s/pvc.yaml'
+          sh 'kubectl apply -f k8s/secret.yaml'
+        }
       }
     }
   }
 
   post {
-    always { cleanWs() }
+    always {
+      cleanWs()
+    }
   }
 }
