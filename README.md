@@ -18,7 +18,7 @@ Ce dépôt contient :
    ```bash
    cd terraform
    terraform init
-   terraform apply -auto-approve```
+   terraform apply -auto-approve ```
  3.Deux VMs sont créées :
   - jenkins-vm (192.168.56.1)
   - k8s-vm (192.168.56.4)
