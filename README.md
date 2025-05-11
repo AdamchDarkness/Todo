@@ -40,8 +40,8 @@ Ce dépôt contient :
    ``bash
    cd app
    python3 -m pip install -r requirements.txt
-   FLASK_APP=app.py flask run `
-  ``
+   FLASK_APP=app.py flask run
+  ```
 - Accessible sur http://localhost:5000.
 
 ## 3. Pipeline Jenkins
