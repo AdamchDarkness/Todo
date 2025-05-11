@@ -59,10 +59,10 @@ Ce dépôt contient :
 
 ## 4. Déploiement Kubernetes
    Fournis dans k8s/ :
-      - pvc.yaml : PersistentVolumeClaim 1 Gi \
-      - secret.yaml : secret FLASK_ENV=prod (Base64) \
-      - deployment.yaml : Deployment 1 réplique, volume + secret injecté \  
-      - service.yaml : Service NodePort exposé sur le port 30080 \ 
+      - pvc.yaml : PersistentVolumeClaim 1 Gi 
+      - secret.yaml : secret FLASK_ENV=prod (Base64) 
+      - deployment.yaml : Deployment 1 réplique, volume + secret injecté 
+      - service.yaml : Service NodePort exposé sur le port 30080 
    Appliquer
       ```bash
       export KUBECONFIG=~/.kube/config
@@ -70,7 +70,7 @@ Ce dépôt contient :
       kubectl apply -f k8s/secret.yaml
       kubectl apply -f k8s/deployment.yaml
       kubectl apply -f k8s/service.yaml
-    ```
+       ```
 ## 5. Déploiement Kubernetes
    - Branches:
       - main → code stable
